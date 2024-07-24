@@ -12,7 +12,7 @@
 class MazeNode
 {
 public:
-    MazeNode() : m_pos(Point(0, 0))
+    MazeNode() : m_pos(Point(0, 0)), m_visited(false)
     {
     }
 
@@ -80,7 +80,14 @@ public:
         return WEST;
     }
 
-    void clearNeighborWall(MazeNode* neighbor)
+    void reset()
+    {
+        // mark as unvisited
+        m_visited = false;
+        m_isActive = false;
+    }
+
+    static void clearNeighborWall(MazeNode* neighbor)
     {
     }
 
@@ -95,12 +102,28 @@ public:
         return m_walls & wall;
     }
 
+    [[nodiscard]] bool hasWall(const Direction direction) const
+    {
+        switch (direction)
+        {
+        case NORTH:
+            return hasWall(MazeWall::NORTH);
+        case SOUTH:
+            return hasWall(MazeWall::SOUTH);
+        case WEST:
+            return hasWall(MazeWall::WEST);
+        case EAST:
+        default:
+            return hasWall(MazeWall::EAST);
+        }
+    }
+
     void setWall(const MazeWall::MazeWall wall)
     {
         m_walls |= wall;
     }
 
-    void clearWall(MazeWall::MazeWall wall)
+    void clearWall(const MazeWall::MazeWall wall)
     {
         m_walls &= ~wall;
     }
@@ -130,12 +153,33 @@ public:
         return m_isStart;
     }
 
-    bool isValid() const
+    [[nodiscard]] bool isValid() const
     {
         return m_pos.getX() >= 0 && m_pos.getY() >= 0;
     }
 
-    void removeWall(Direction direction, MazeNode* neighbor)
+    void setVisited()
+    {
+        m_visited = true;
+        m_isActive = false;
+    }
+
+    void setActive()
+    {
+        m_isActive = true;
+    }
+
+    [[nodiscard]] bool isActive() const
+    {
+        return m_isActive;
+    }
+    
+    [[nodiscard]] bool isVisited() const
+    {
+        return m_visited;
+    }
+
+    void removeWall(const Direction direction, MazeNode* neighbor)
     {
         switch (direction)
         {
@@ -158,7 +202,7 @@ public:
         }
     }
 
-    void removeWall(Direction direction)
+    void removeWall(const Direction direction)
     {
         switch (direction)
         {
@@ -177,11 +221,24 @@ public:
         }
     }
 
+    bool operator<(const MazeNode& rhs) const
+    {
+        return m_pos < rhs.m_pos;
+    }
+
+    bool operator>(const MazeNode& rhs) const
+    {
+        return rhs < *this;
+    }
+    
+
 private:
     uint8_t m_walls = MazeWall::ALL;
     Point m_pos;
+    bool m_visited = false;
     bool m_isGoal = false;
     bool m_isStart = false;
+    bool m_isActive = false;
 };
 
 

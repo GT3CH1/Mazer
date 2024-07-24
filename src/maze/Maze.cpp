@@ -5,27 +5,45 @@
 #include "Maze.h"
 
 #include <stack>
+// static Maze::instance = nullptr;
+std::vector<MazeNode> Maze::m_nodes = std::vector<MazeNode>();
+Size Maze::m_size = Size();
+Point Maze::m_end = Point(0, 0);
 
 Maze::Maze(const Size size, const Point start, const Point end, int seed) :
-    m_size(size), m_start(start), m_end(end), m_seed(seed)
+    m_start(start), m_seed(seed)
 {
     // instance = this;
-    m_nodes = std::vector<MazeNode>(size.x * size.y);
+    m_size = size;
+    m_end = end;
+
+    generate();
+
+    solver.push(get(m_start));
+}
+
+int Maze::getDistanceToGoal(const MazeNode* node)
+{
+    // get manhattan distance to goal
+    const auto goal = get(m_end);
+    const auto distance = abs(node->getPos().getX() - goal->getPos().getX()) + abs(
+        node->getPos().getY() - goal->getPos().getY());
+    return distance;
+}
+
+void Maze::generate() const
+{
+    m_nodes = std::vector<MazeNode>(m_size.x * m_size.y);
     // set pos for each node
-    for (int y = 0; y < size.y; y++)
+    for (int y = 0; y < m_size.y; y++)
     {
-        for (int x = 0; x < size.x; x++)
+        for (int x = 0; x < m_size.x; x++)
         {
             get(x, y)->setPos(Point(x, y));
         }
     }
-    generate();
     get(m_start)->setStart();
     get(m_end)->setGoal();
-}
-
-void Maze::generate()
-{
     auto stack = std::stack<MazeNode*>();
     auto visited = std::vector(m_size.area(), false);
     stack.push(get(m_start));
@@ -54,9 +72,51 @@ void Maze::generate()
             stack.push(neighbor);
             visited[neighbor->getPos().getY() * m_size.x + neighbor->getPos().getX()] = true;
             // remove wall between node and neighbor
-            auto direction = node->getDirectionToNeighbor(neighbor);
+            const auto direction = node->getDirectionToNeighbor(neighbor);
             node->removeWall(direction, neighbor);
             // neighbor->removeWall(opposite(direction));
         }
     }
+}
+
+bool Maze::solved()
+{
+    // check if the goal node has been visited
+    return get(m_end)->isVisited();
+}
+
+void Maze::reset(const SolveType solveType)
+{
+    setSolveType(solveType);
+    reset();
+}
+
+void Maze::reset()
+{
+    for (auto& node : m_nodes)
+    {
+        node.reset();
+    }
+    solver.clear();
+    solver.push(get(m_start));
+}
+
+void Maze::setSolveType(SolveType type)
+{
+    solver.setSolveType(type);
+}
+
+std::vector<MazeNode*> Maze::getNeighbors(const MazeNode node)
+{
+    auto neighbors = std::vector<MazeNode*>();
+    for (const auto direction : {NORTH, SOUTH, WEST, EAST})
+    {
+        auto loc = node.move(direction);
+        auto neighbor = get(loc.getX(), loc.getY());
+        if (neighbor != nullptr && !node.hasWall(direction))
+        {
+            neighbors.push_back(neighbor);
+        }
+    }
+    return neighbors;
 }

@@ -5,25 +5,26 @@
 #ifndef MAZE_H
 #define MAZE_H
 #include <vector>
-
 #include "MazeNode.h"
 #include "types.h"
+#include "Solver.h"
 
 class Maze
 {
-private:
-    std::vector<MazeNode> m_nodes;
-    Size m_size;
     Point m_start;
-    Point m_end;
     int m_seed;
+    Solver solver = Solver(Djikstra);
+    static std::vector<MazeNode> m_nodes;
+    static Size m_size;
+    static Point m_end;
+
     // static Maze* instance;
 
 public:
     Maze(Size size, Point start, Point end, int seed);
-    [[nodiscard]] int getDimension() const { return m_size.area(); }
+    [[nodiscard]] static int getDimension() { return m_size.area(); }
 
-    [[nodiscard]] MazeNode* get(const Point point)
+    [[nodiscard]] static MazeNode* get(const Point point)
     {
         // validate pos
         if (point.getX() >= 0 && point.getX() < m_size.x && point.getY() >= 0 && point.getY() < m_size.y)
@@ -31,25 +32,30 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] MazeNode* get(const int x, const int y)
+    [[nodiscard]] static MazeNode* get(const int x, const int y)
     {
+        if (x < 0 || x >= m_size.x || y < 0 || y >= m_size.y)
+            return nullptr;
         return &m_nodes[y * m_size.x + x];
     }
 
-    // static bool isInside(const Point point)
-    // {
-    //     return isInside(point.getX(), point.getY());
-    // }
-    //
-    // static bool isInside(const int x, const int y)
-    // {
-    //     return x >= 0 && x < instance->m_size.x && y >= 0 && y < instance->m_size.y;
-    // }
+    static int getDistanceToGoal(const MazeNode* node);
+    void generate() const;
+    static bool solved();
+    static int getSize() { return m_size.x; }
 
-    void generate();
-    int getSize() const { return m_size.x; }
+    void reset(SolveType solveType);
+    void reset();
+    void setSolveType(SolveType type);
+
+    void doSolveMove()
+    {
+        if (!solved())
+            solver.doMove();
+    }
+
+    static std::vector<MazeNode*> getNeighbors(MazeNode node);
 };
 
-// static Maze::instance = nullptr;
 
 #endif //MAZE_H

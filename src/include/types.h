@@ -17,7 +17,7 @@ enum Direction
 class Size
 {
 public:
-    Size(const int width, const int height) : x(width), y(height)
+    explicit Size(const int width = 0, const int height = 0) : x(width), y(height)
     {
     }
 
@@ -36,6 +36,15 @@ public:
     [[nodiscard]] int getX() const { return x; }
     [[nodiscard]] int getY() const { return y; }
     bool operator==(const Point& other) const { return x == other.x && y == other.y; }
+
+    bool operator>(const Point& other) const
+    {
+        // calculate manhattan distance
+        return x > other.x && y > other.y;
+    }
+
+    bool operator<(const Point& other) const { return x < other.x && y < other.y; }
+    bool operator>=(const Point& other) const { return x >= other.x && y >= other.y; }
 
 private:
     int x;
