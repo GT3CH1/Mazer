@@ -10,9 +10,20 @@ std::vector<MazeNode> Maze::m_nodes = std::vector<MazeNode>();
 Size Maze::m_size = Size();
 Point Maze::m_end = Point(0, 0);
 
+Maze::Maze(Size size, Point start) : m_start(start)
+{
+    m_end = Point(size.x - 1, size.y - 1);
+    m_start = start;
+    srand(time(nullptr));
+    // instance = this;
+    m_size = size;
+    generate();
+    solver.push(get(m_start));}
+
 Maze::Maze(const Size size, const Point start, const Point end, int seed) :
     m_start(start), m_seed(seed)
 {
+    srand(seed);
     // instance = this;
     m_size = size;
     m_end = end;

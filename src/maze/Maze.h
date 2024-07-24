@@ -12,7 +12,7 @@
 class Maze
 {
     Point m_start;
-    int m_seed;
+    int m_seed{};
     Solver solver = Solver(Djikstra);
     static std::vector<MazeNode> m_nodes;
     static Size m_size;
@@ -21,6 +21,7 @@ class Maze
     // static Maze* instance;
 
 public:
+    Maze(Size size, Point start);
     Maze(Size size, Point start, Point end, int seed);
     [[nodiscard]] static int getDimension() { return m_size.area(); }
 

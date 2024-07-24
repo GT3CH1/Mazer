@@ -7,7 +7,7 @@ int main()
 {
     srandom(time(nullptr));
 
-    auto theMaze = Maze(Size(55, 55), Point(0, 0), Point(54, 54), 0);
+    auto theMaze = Maze(Size(20, 20), Point(0, 0));
     const auto dimension = Maze::getSize();
     const auto pixelSize = 800 / dimension;
 
@@ -18,7 +18,8 @@ int main()
         return 1;
     }
     // Create a window
-    SDL_Window* win = SDL_CreateWindow("Mazer", 100, 100, pixelSize*dimension, pixelSize*dimension, SDL_WINDOW_SHOWN);
+    SDL_Window* win = SDL_CreateWindow("Mazer", 100, 100, pixelSize * dimension, pixelSize * dimension,
+                                       SDL_WINDOW_SHOWN);
     // Create a renderer
     //SDL_RENDERER_PRESENTVSYNC
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
