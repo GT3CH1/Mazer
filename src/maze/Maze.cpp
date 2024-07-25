@@ -9,28 +9,40 @@
 std::vector<MazeNode> Maze::m_nodes = std::vector<MazeNode>();
 Size Maze::m_size = Size();
 Point Maze::m_end = Point(0, 0);
+Point Maze::m_start = Point(0, 0);
 
-Maze::Maze(Size size, Point start) : m_start(start)
+bool Maze::playerSolved() const
 {
+    return playerPos->getPos() == m_end;
+}
+
+Maze::Maze(Size size, Point start)
+{
+    m_start = start;
     m_end = Point(size.x - 1, size.y - 1);
     m_start = start;
     srand(time(nullptr));
     // instance = this;
     m_size = size;
     generate();
-    solver.push(get(m_start));}
+    solver.push(get(m_start));
+    get(m_end)->setGoal();
+    playerPos = new MazeNode();
+    playerPos->setPos(m_start);
+}
 
 Maze::Maze(const Size size, const Point start, const Point end, int seed) :
-    m_start(start), m_seed(seed)
+    m_seed(seed)
 {
     srand(seed);
     // instance = this;
     m_size = size;
     m_end = end;
-
+    m_start = start;
     generate();
 
     solver.push(get(m_start));
+    playerPos->setPos(m_start);
 }
 
 int Maze::getDistanceToGoal(const MazeNode* node)
@@ -90,6 +102,24 @@ void Maze::generate() const
     }
 }
 
+void Maze::movePlayer(Direction direction) const
+{
+    // check if node at current position has wall in direction
+    auto nodeAtPlayerPos = get(playerPos->getPos());
+    if (nodeAtPlayerPos == nullptr)
+        return;
+
+    if (nodeAtPlayerPos->hasWall(direction))
+        return;
+    // move player
+    playerPos->setPos(playerPos->move(direction));
+}
+
+std::set<MazeNode*> Maze::getVisitedNodes()
+{
+    return solver.getVisitedNodes();
+}
+
 bool Maze::solved()
 {
     // check if the goal node has been visited
@@ -110,6 +140,9 @@ void Maze::reset()
     }
     solver.clear();
     solver.push(get(m_start));
+    delete playerPos;
+    playerPos = new MazeNode();
+    playerPos->setPos(m_start);
 }
 
 void Maze::setSolveType(SolveType type)

@@ -173,7 +173,7 @@ public:
     {
         return m_isActive;
     }
-    
+
     [[nodiscard]] bool isVisited() const
     {
         return m_visited;
@@ -230,7 +230,6 @@ public:
     {
         return rhs < *this;
     }
-    
 
 private:
     uint8_t m_walls = MazeWall::ALL;

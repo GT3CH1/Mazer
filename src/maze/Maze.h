@@ -11,19 +11,22 @@
 
 class Maze
 {
-    Point m_start;
+    static Point m_start;
     int m_seed{};
     Solver solver = Solver(Djikstra);
     static std::vector<MazeNode> m_nodes;
     static Size m_size;
     static Point m_end;
-
+    MazeNode* playerPos;
     // static Maze* instance;
 
 public:
     Maze(Size size, Point start);
     Maze(Size size, Point start, Point end, int seed);
     [[nodiscard]] static int getDimension() { return m_size.area(); }
+    [[nodiscard]] bool playerSolved() const;
+    static MazeNode* getEnd() { return get(m_end); }
+    static MazeNode* getStart() { return get(m_start); }
 
     [[nodiscard]] static MazeNode* get(const Point point)
     {
@@ -42,12 +45,15 @@ public:
 
     static int getDistanceToGoal(const MazeNode* node);
     void generate() const;
+    void movePlayer(Direction direction) const;
+    std::set<MazeNode*> getVisitedNodes();
     static bool solved();
     static int getSize() { return m_size.x; }
 
     void reset(SolveType solveType);
     void reset();
     void setSolveType(SolveType type);
+    [[nodiscard]] MazeNode* playerNode() const { return playerPos; }
 
     void doSolveMove()
     {

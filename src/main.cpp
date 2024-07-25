@@ -3,14 +3,16 @@
 
 #include "Maze.h"
 
+void draw_walls(int dimension, int pixelSize, SDL_Renderer* ren, SDL_Texture*& texture);
+int mazeSize = 5;
+
 int main()
 {
     srandom(time(nullptr));
 
-    auto theMaze = Maze(Size(20, 20), Point(0, 0));
-    const auto dimension = Maze::getSize();
-    const auto pixelSize = 800 / dimension;
-
+    auto theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
+    auto dimension = Maze::getSize();
+    auto pixelSize = 700 / dimension;
     // Initialize DL
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -30,8 +32,8 @@ int main()
     bool firstTick = true;
     bool draw = true;
     bool pause = false;
-    // theMaze.get(0, 0)->clearAllWalls();
-    // theMaze.get(1, 0)->clearAllWalls();
+    SDL_Texture* texture;
+    draw_walls(dimension, pixelSize, ren, texture);
     while (!quit)
     {
         // check for events
@@ -63,6 +65,7 @@ int main()
                 case SDLK_n:
                     theMaze.reset();
                     theMaze.generate();
+                    draw_walls(dimension, pixelSize, ren, texture);
                     break;
                 case SDLK_SPACE:
                     pause = !pause;
@@ -70,76 +73,121 @@ int main()
                 case SDLK_s:
                     draw = !draw;
                     break;
+                case SDLK_UP:
+                    theMaze.movePlayer(NORTH);
+                    break;
+                case SDLK_DOWN:
+                    theMaze.movePlayer(SOUTH);
+                    break;
+                case SDLK_LEFT:
+                    theMaze.movePlayer(WEST);
+                    break;
+                case SDLK_RIGHT:
+                    theMaze.movePlayer(EAST);
+                    break;
                 default:
                     break;
                 }
             }
         }
         // draw a white background
-        SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
+
         // for each cell in the maze, draw a black rectangle
-
-
         if (!firstTick && !pause)
             theMaze.doSolveMove();
-        firstTick = false;
-        for (int i = 0; i < Maze::getDimension(); i++)
+        if (theMaze.playerSolved())
         {
-            for (int j = 0; j < Maze::getDimension(); j++)
+            mazeSize += 5;
+            theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
+            dimension = Maze::getSize();
+            pixelSize = 700 / dimension;
+            theMaze.generate();
+            draw_walls(dimension, pixelSize, ren, texture);
+        }
+        firstTick = false;
+        auto playerPos = theMaze.playerNode()->getPos();
+        SDL_SetRenderDrawColor(ren, 255, 0, 255, 255);
+        SDL_RenderFillRect(ren, new SDL_Rect{
+                               playerPos.getX() * pixelSize, playerPos.getY() * pixelSize, pixelSize, pixelSize
+                           });
+        for (const auto node : theMaze.getVisitedNodes())
+        {
+            const auto i = node->getPos().getX();
+            const auto j = node->getPos().getY();
+            // draw walls for each cell
+            if (node->isVisited() && draw)
             {
-                auto node = Maze::get(i, j);
-                if (node == nullptr)
-                    continue;
-                // draw walls for each cell
-                if (node->isVisited() && draw)
-                {
-                    SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-                    SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
-                }
-                if (node->isGoal())
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
-                    SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
-                }
-                if (node->isActive() && draw)
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 255, 255, 255);
-                    SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
-                }
-                if (node->isStart())
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
-                    SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
-                }
+                SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
+                SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
+            }
 
-                if (node->hasWall(MazeWall::NORTH))
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-                    SDL_RenderDrawLine(ren, i * pixelSize, j * pixelSize, (i + 1) * pixelSize, j * pixelSize);
-                }
-                if (node->hasWall(MazeWall::EAST))
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-                    SDL_RenderDrawLine(ren, (i + 1) * pixelSize, j * pixelSize, (i + 1) * pixelSize,
-                                       (j + 1) * pixelSize);
-                }
-                if (node->hasWall(MazeWall::SOUTH))
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-                    SDL_RenderDrawLine(ren, i * pixelSize, (j + 1) * pixelSize, (i + 1) * pixelSize,
-                                       (j + 1) * pixelSize);
-                }
-                if (node->hasWall(MazeWall::WEST))
-                {
-                    SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-                    SDL_RenderDrawLine(ren, i * pixelSize, j * pixelSize, i * pixelSize, (j + 1) * pixelSize);
-                }
+            if (node->isActive() && draw)
+            {
+                SDL_SetRenderDrawColor(ren, 0, 100, 100, 255);
+                SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
+            }
+            if (node->isStart())
+            {
+                SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
+                SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
             }
         }
+        {
+            auto node = Maze::getEnd();
+            const auto i = node->getPos().getX();
+            const auto j = node->getPos().getY();
+            SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
+            SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
+        }
+        {
+            auto node = Maze::getStart();
+            const auto i = node->getPos().getX();
+            const auto j = node->getPos().getY();
+            SDL_SetRenderDrawColor(ren, 0, 0, 255, 255);
+            SDL_RenderFillRect(ren, new SDL_Rect{i * pixelSize, j * pixelSize, pixelSize, pixelSize});
+        }
 
+        SDL_SetRenderDrawColor(ren, 150, 150, 150, 255);
+        SDL_RenderCopy(ren, texture, nullptr, nullptr);
         SDL_RenderPresent(ren);
     }
-
     return 0;
+}
+
+void draw_walls(const int dimension, const int pixelSize, SDL_Renderer* ren, SDL_Texture*& texture)
+{
+    texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 700, 700);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+    SDL_SetRenderTarget(ren, texture);
+    for (int i = 0; i < dimension; i++)
+    {
+        for (int j = 0; j < dimension; j++)
+        {
+            const auto node = Maze::get(i, j);
+            if (node == nullptr)
+                continue;
+            SDL_SetRenderDrawColor(ren, 75, 75, 75, 255);
+            if (node->hasWall(MazeWall::NORTH))
+            {
+                SDL_RenderDrawLine(ren, i * pixelSize, j * pixelSize, (i + 1) * pixelSize, j * pixelSize);
+            }
+            if (node->hasWall(MazeWall::EAST))
+            {
+                SDL_RenderDrawLine(ren, (i + 1) * pixelSize, j * pixelSize, (i + 1) * pixelSize,
+                                   (j + 1) * pixelSize);
+            }
+            if (node->hasWall(MazeWall::SOUTH))
+            {
+                SDL_RenderDrawLine(ren, i * pixelSize, (j + 1) * pixelSize, (i + 1) * pixelSize,
+                                   (j + 1) * pixelSize);
+            }
+            if (node->hasWall(MazeWall::WEST))
+            {
+                SDL_RenderDrawLine(ren, i * pixelSize, j * pixelSize, i * pixelSize, (j + 1) * pixelSize);
+            }
+        }
+    }
+    SDL_SetRenderTarget(ren, nullptr);
 }

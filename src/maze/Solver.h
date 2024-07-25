@@ -5,6 +5,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 #include <queue>
+#include <set>
 #include <stack>
 #include "MazeNode.h"
 
@@ -31,12 +32,14 @@ public:
     void clear();
     MazeNode* pop();
     bool isEmpty();
+    std::set<MazeNode*> getVisitedNodes() { return visited; }
 
 private:
     SolveType solveType;
     std::queue<MazeNode*> bfsQueue;
     std::stack<MazeNode*> dfsStack;
     std::priority_queue<MazeNode*> aStarQueue;
+    std::set<MazeNode*> visited;
 };
 
 

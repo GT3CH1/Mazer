@@ -14,6 +14,7 @@ Solver::Solver(const SolveType solveType)
 
 void Solver::push(MazeNode* node)
 {
+    visited.insert(node);
     switch (solveType)
     {
     case BFS:
