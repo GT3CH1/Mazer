@@ -12,6 +12,10 @@
 class MazeNode
 {
 public:
+    explicit MazeNode(const Point point) : m_pos(point)
+    {
+    }
+
     MazeNode() : m_pos(Point(0, 0)), m_visited(false)
     {
     }
@@ -87,8 +91,9 @@ public:
         m_isActive = false;
     }
 
-    static void clearNeighborWall(MazeNode* neighbor)
+    void resetWalls()
     {
+        m_walls = MazeWall::ALL;
     }
 
     [[nodiscard]] Point getPos() const

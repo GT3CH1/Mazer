@@ -29,6 +29,10 @@ public:
 class Point
 {
 public:
+    Point() : x(0), y(0)
+    {
+    }
+
     Point(const int x, const int y) : x(x), y(y)
     {
     }
