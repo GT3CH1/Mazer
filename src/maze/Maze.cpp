@@ -79,6 +79,7 @@ void Maze::reset()
     {
         node->reset();
     }
+    visited.clear();
     solver.clear();
     solver.push(get(m_start));
     delete playerPos;

@@ -4,7 +4,15 @@
 #include "Maze.h"
 
 void draw_walls(int dimension, int pixelSize, SDL_Renderer* ren, SDL_Texture*& texture);
-int mazeSize = 5;
+int mazeSize = 15;
+
+void resetWalls(int dimension, int pixelSize, SDL_Renderer* ren, SDL_Texture*& texture)
+{
+    SDL_SetRenderTarget(ren, texture);
+    SDL_RenderClear(ren);
+    draw_walls(dimension, pixelSize, ren, texture);
+    SDL_SetRenderTarget(ren, nullptr);
+}
 
 void draw_maze_nodes(Maze theMaze, int pixelSize, SDL_Renderer* ren, bool draw)
 {
@@ -53,7 +61,7 @@ int main()
 
     auto theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
     auto dimension = Maze::getSize();
-    auto pixelSize = 700 / dimension;
+    auto pixelSize = 800 / dimension;
     // Initialize DL
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -61,7 +69,7 @@ int main()
         return 1;
     }
     // Create a window
-    SDL_Window* win = SDL_CreateWindow("Mazer", 100, 100, pixelSize * dimension, pixelSize * dimension,
+    SDL_Window* win = SDL_CreateWindow("Mazer", 100, 100, 800, 800,
                                        SDL_WINDOW_SHOWN);
     // Create a renderer
     //SDL_RENDERER_PRESENTVSYNC
@@ -74,7 +82,7 @@ int main()
     bool draw = true;
     bool pause = true;
     bool showGeneration = true;
-    SDL_Texture* texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 700, 700);
+    SDL_Texture* texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 800, 800);
 
     draw_walls(dimension, pixelSize, ren, texture);
     while (!quit)
@@ -105,9 +113,36 @@ int main()
                 case SDLK_r:
                     theMaze.reset();
                     break;
+                case SDLK_LEFTBRACKET:
+                    {
+                        // decrease maze size
+                        if (mazeSize > 5)
+                            mazeSize -= 5;
+                        theMaze.reset();
+                        theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
+                        MazeGenerator::reset();
+                        Maze::generate(false);
+                        pixelSize = 800 / mazeSize;
+                        dimension = Maze::getSize();
+                        resetWalls(dimension, pixelSize, ren, texture);
+                        break;
+                    }
+                case SDLK_RIGHTBRACKET:
+                    {
+                        // increase maze size
+                        mazeSize += 5;
+                        // theMaze.reset();
+                        theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
+                        MazeGenerator::reset();
+                        Maze::generate(false);
+                        pixelSize = 800 / mazeSize;
+                        dimension = Maze::getSize();
+                        resetWalls(dimension, pixelSize, ren, texture);
+
+                        break;
+                    }
                 case SDLK_n:
-                    // theMaze.reset();
-                    // Maze::generate();
+                    theMaze.reset();
                     MazeGenerator::reset();
                     Maze::generate(false);
                     draw_walls(dimension, pixelSize, ren, texture);
@@ -136,6 +171,7 @@ int main()
                         if (showGeneration)
                         {
                             SDL_RenderClear(ren);
+                            theMaze.reset();
                             MazeGenerator::reset();
                             Maze::generate(true);
                         }
@@ -181,7 +217,7 @@ int main()
             mazeSize += 5;
             theMaze = Maze(Size(mazeSize, mazeSize), Point(0, 0));
             dimension = Maze::getSize();
-            pixelSize = 700 / dimension;
+            pixelSize = 800 / dimension;
             theMaze.generate();
             draw_walls(dimension, pixelSize, ren, texture);
         }

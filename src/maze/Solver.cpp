@@ -90,6 +90,7 @@ void Solver::clear()
             aStarQueue.pop();
         break;
     }
+    visited.clear();
 }
 
 void Solver::doMove()

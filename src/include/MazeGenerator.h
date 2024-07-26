@@ -4,13 +4,12 @@
 
 #ifndef MAZEGENERATOR_H
 #define MAZEGENERATOR_H
-#include "MazeNode.h"
+#include "../maze/MazeNode.h"
 #include <vector>
 #include <stack>
 
 class MazeGenerator
 {
-private:
     static std::stack<MazeNode*> generationStack;
     static std::vector<bool> visited;
     static std::vector<MazeNode*>* map;
@@ -49,6 +48,10 @@ public:
      */
     static bool doneGenerating();
 
+    /**
+     *  Returns the top of the generation stack
+     * @return the top of the generation stack
+     */
     static MazeNode* getTop()
     {
         if (generationStack.empty())

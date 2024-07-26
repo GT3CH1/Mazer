@@ -2,7 +2,7 @@
 // Created by GT3CH1 on 7/25/24.
 //
 
-#include "MazeGenerator.h"
+#include "../include/MazeGenerator.h"
 Size MazeGenerator::m_size;
 Point MazeGenerator::m_start;
 Point MazeGenerator::m_end;
@@ -17,6 +17,7 @@ MazeGenerator::MazeGenerator(const Size size, const Point start, const Point end
     m_start = start;
     m_end = end;
     visited = std::vector<bool>(m_size.area());
+    visited[m_start.getY() * m_size.x + m_start.getX()] = true;
     reset();
 }
 
@@ -46,17 +47,17 @@ void MazeGenerator::psuedorandomDfsTick()
         auto neighbor = get(node->move(direction));
         if (neighbor == nullptr)
             continue;
-        auto neighborPos = neighbor->getPos();
-        if (const auto neighborVisited = visited[neighborPos.getY() * m_size.x + neighborPos.getX()]; !neighborVisited)
-        {
-            neighbors.push_back(neighbor);
-        }
+        if (neighbor->isVisited())
+            continue;
+        neighbors.push_back(neighbor);
     }
     // pick a random neighbor
     if (!neighbors.empty())
     {
         // check if neighbors is goal
         const auto neighbor = neighbors[random() % neighbors.size()];
+        if (neighbor->isVisited())
+            return;
         generationStack.push(node);
         generationStack.push(neighbor);
         visited[neighbor->getPos().getY() * m_size.x + neighbor->getPos().getX()] = true;
@@ -64,6 +65,7 @@ void MazeGenerator::psuedorandomDfsTick()
         // remove wall between node and neighbor
         const auto direction = node->getDirectionToNeighbor(neighbor);
         node->removeWall(direction, neighbor);
+        neighbor->setVisited();
     }
 }
 
