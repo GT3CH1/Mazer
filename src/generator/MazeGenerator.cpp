@@ -2,7 +2,7 @@
 // Created by GT3CH1 on 7/25/24.
 //
 
-#include "../include/MazeGenerator.h"
+#include "MazeGenerator.h"
 Size MazeGenerator::m_size;
 Point MazeGenerator::m_start;
 Point MazeGenerator::m_end;
@@ -65,7 +65,7 @@ void MazeGenerator::psuedorandomDfsTick()
         // remove wall between node and neighbor
         const auto direction = node->getDirectionToNeighbor(neighbor);
         node->removeWall(direction, neighbor);
-        neighbor->setVisited();
+        neighbor->visit();
     }
 }
 

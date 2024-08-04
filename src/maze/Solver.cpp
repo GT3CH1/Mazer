@@ -111,7 +111,7 @@ void Solver::doMove()
             {
                 if (!neighbor->isVisited())
                 {
-                    neighbor->setVisited();
+                    neighbor->visit();
                     push(neighbor);
                     push(node);
                 }
@@ -131,7 +131,7 @@ void Solver::doMove()
             {
                 if (!neighbor->isVisited())
                 {
-                    neighbor->setVisited();
+                    neighbor->visit();
                     push(neighbor);
                     push(node);
                     return;
@@ -152,7 +152,7 @@ void Solver::doMove()
             {
                 if (!neighbor->isVisited())
                 {
-                    neighbor->setVisited();
+                    neighbor->visit();
                     push(neighbor);
                     push(node);
                     return;
