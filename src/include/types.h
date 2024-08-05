@@ -4,7 +4,7 @@
 
 #ifndef TYPES_H
 #define TYPES_H
-
+#include <random>
 /**
  * An enum that represents a direction..
  */
@@ -15,6 +15,8 @@ enum Direction
   SOUTH,
   WEST
 };
+
+static Direction getRandomDirection() { return static_cast<Direction>(random() % 4); }
 
 /**
  * A class that represents a size in 2D space.
@@ -51,6 +53,10 @@ class Point
 
   bool operator<(const Point &other) const { return x < other.x && y < other.y; }
   bool operator>=(const Point &other) const { return x >= other.x && y >= other.y; }
+  static Point getRandom(Size size)
+  {
+    return {static_cast<int>(random()) % size.x, static_cast<int>(random()) % size.y};
+  }
 
   private:
   int x;
@@ -170,6 +176,7 @@ enum MazeEntityType
 {
   PLAYER,
   GOAL,
+  ENEMY,
   NODE
 };
 

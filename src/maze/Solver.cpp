@@ -105,7 +105,7 @@ void Solver::doMove()
                 break;
             node->setActive();
             // get the neighbors
-            auto neighbors = Maze::getNeighbors(*node);
+            auto neighbors = Maze::getNeighbors(node);
             // iterate through the neighbors, and push them to the queue if not visited
             for (auto neighbor : neighbors)
             {
@@ -126,7 +126,7 @@ void Solver::doMove()
                 break;
             node->setActive();
             // get the first neighbor
-            auto neighbors = Maze::getNeighbors(*node);
+            auto neighbors = Maze::getNeighbors(node);
             for (auto neighbor : neighbors)
             {
                 if (!neighbor->isVisited())
@@ -147,7 +147,7 @@ void Solver::doMove()
                 break;
             node->setActive();
             // get the first neighbor
-            auto neighbors = Maze::getNeighbors(*node);
+            auto neighbors = Maze::getNeighbors(node);
             for (auto neighbor : neighbors)
             {
                 if (!neighbor->isVisited())

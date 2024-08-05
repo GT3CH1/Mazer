@@ -6,7 +6,9 @@
 #define ENTITYMANAGER_H
 
 #include <vector>
+#include "MazeEnemyEntity.h"
 #include "MazeEntity.h"
+#include "MazeGoalEntity.h"
 #include "MazePlayerEntity.h"
 
 class EntityManager
@@ -15,8 +17,10 @@ class EntityManager
   std::vector<MazeEntity *> nodes;
   int m_nodeCount;
   int m_nextNodeIndex = 0;
+  Size m_size;
 
   MazePlayerEntity *m_player = nullptr;
+  MazeGoalEntity *m_goal = nullptr;
 
   /**
    * Finds the next available node index
@@ -25,7 +29,8 @@ class EntityManager
   [[nodiscard]] int findNextNodeIndex() const;
 
   public:
-  explicit EntityManager(int nodeCount);
+  explicit EntityManager(int nodeCount, Size size);
+  EntityManager() : EntityManager(100, Size(15, 15)) {}
   ~EntityManager();
 
   /**
@@ -45,7 +50,13 @@ class EntityManager
    */
   [[nodiscard]] MazePlayerEntity *getPlayer() const;
 
+  [[nodiscard]] MazeGoalEntity *getGoal() const { return m_goal; }
+
   void setPlayerPos(const Point pos) const { m_player->setPos(pos); }
+
+  void render(SDL_Renderer *ren, int pixelSize) const;
+  void onTick() const;
+  static bool canMove(Point pos, Direction direction);
 };
 
 

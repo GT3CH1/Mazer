@@ -15,6 +15,7 @@
 class MazeNode
 {
   public:
+  virtual ~MazeNode() = default;
   /**
    * Create a new MazeNode at the given position.
    * @param point The position of the node in the maze.
@@ -169,6 +170,9 @@ class MazeNode
   void setStart() { m_isStart = true; }
   [[nodiscard]] bool isStart() const { return m_isStart; }
 
+  void setParent(MazeNode *parent) { m_parent = parent; }
+  [[nodiscard]] MazeNode *getParent() const { return m_parent; }
+
   private:
   uint8_t m_walls = MazeWall::ALL;
   Point m_pos;
@@ -176,6 +180,7 @@ class MazeNode
   bool m_isGoal = false;
   bool m_isStart = false;
   bool m_isActive = false;
+  MazeNode* m_parent;
 };
 
 

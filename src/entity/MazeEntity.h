@@ -5,6 +5,9 @@
 #ifndef MAZEENTITY_H
 #define MAZEENTITY_H
 
+#include <SDL2/SDL.h>
+
+
 #include "MazeNode.h"
 #include "types.h"
 
@@ -34,8 +37,11 @@ class MazeEntity : public MazeNode
 
   bool operator==(const MazeEntity &rhs) const { return m_id == rhs.m_id; }
 
-  public:
   [[nodiscard]] Color *getColor() { return &m_color; }
+
+  void render(SDL_Renderer *renderer, int pixelSize) const;
+
+  virtual void onTick(){};
 };
 
 

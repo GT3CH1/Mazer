@@ -6,6 +6,11 @@
 void draw_walls(int dimension, int pixelSize, SDL_Renderer *ren, SDL_Texture *&texture);
 int mazeSize = 15;
 
+// time since last tick
+Uint32 lastTime = 0;
+Uint32 currentTime = 0;
+
+
 void resetWalls(const int dimension, const int pixelSize, SDL_Renderer *ren, SDL_Texture *&texture)
 {
   SDL_SetRenderTarget(ren, texture);
@@ -237,11 +242,18 @@ int main()
     SDL_RenderFillRect(ren,
                        new SDL_Rect{playerPos.getX() * pixelSize, playerPos.getY() * pixelSize, pixelSize, pixelSize});
     draw_maze_nodes(theMaze, pixelSize, ren, draw);
-    draw_start_end_nodes(pixelSize, ren);
+    Maze::getEntityManager()->render(ren, pixelSize);
+    // draw_start_end_nodes(pixelSize, ren);
 
     SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
     SDL_RenderCopy(ren, texture, nullptr, nullptr);
     SDL_RenderPresent(ren);
+    currentTime = SDL_GetTicks();
+    if (currentTime - lastTime > 500)
+    {
+      Maze::getEntityManager()->onTick();
+      lastTime = SDL_GetTicks();
+    }
   }
   return 0;
 }

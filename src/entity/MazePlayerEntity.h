@@ -10,7 +10,7 @@
 class MazePlayerEntity : public MazeEntity
 {
   public:
-  explicit MazePlayerEntity(const Point position, const Color color = Color(PURPLE)) :
+  explicit MazePlayerEntity(const Point position, const Color color = Color(GREEN)) :
       MazeEntity(position, PLAYER, color)
   {
   }

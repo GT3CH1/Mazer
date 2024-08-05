@@ -18,8 +18,8 @@ class Maze
   Solver solver = Solver(Djikstra);
   static std::vector<MazeNode *> *m_nodes;
   static Size m_size;
-  static Point m_end;
   static EntityManager entityManager;
+  
   // static Maze* instance;
   MazeGenerator generator;
 
@@ -30,8 +30,8 @@ class Maze
   [[nodiscard]] static int getDimension() { return m_size.area(); }
   [[nodiscard]] static bool playerSolved();
   static void generate(bool iterative = false);
-  static MazeNode *getEnd() { return get(m_end); }
-  static MazeNode *getStart() { return get(m_start); }
+  static MazeNode *getEnd() { return get(entityManager.getGoal()->getPos()); }
+  static MazeNode *getStart() { return get(entityManager.getPlayer()->getPos()); }
 
   static std::stack<MazeNode *> generationStack;
 
@@ -53,6 +53,8 @@ class Maze
     }
     return m_nodes->at(y * m_size.x + x);
   }
+
+  static std::vector<MazeNode*>* getNodes() { return m_nodes; }
 
   static int getDistanceToGoal(const MazeNode *node);
   static void movePlayer(Direction direction);
@@ -86,7 +88,7 @@ class Maze
 
   static EntityManager *getEntityManager() { return &entityManager; }
 
-  static std::vector<MazeNode *> getNeighbors(MazeNode node);
+  static std::vector<MazeNode *> getNeighbors(const MazeNode *node);
 };
 
 
